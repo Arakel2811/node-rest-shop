@@ -2,6 +2,7 @@
 // INITIALIZATIONS
 const express = require('express');
 const app = express();
+const config = require('config');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
@@ -22,7 +23,7 @@ mongoose.connect('mongodb+srv://node-shop:' + process.env.MONGO_ATLAS_PASSWORD +
 app.use(helmet()); // Help secure Express apps with various HTTP headers
 
 //ss We can set environment variables via command line like this:
-// $ export NODE_ENV=production // Mac
+// $ export NODE_ENV=production // Mac & Linux (UNIX-based)
 // $ set NODE_ENV=production // Windows
 // by default NODE_ENV is 'development'
 // const nodeEnv = process.env.NODE_ENV;
@@ -30,6 +31,21 @@ const nodeEnv = app.get('env'); // this is another way to get environment NODE_E
 if(nodeEnv === 'development'){
     app.use(morgan('dev')); // 'tiny' // logs in terminal request description
 }
+
+//ss Working with config variables
+// these two lines will find config variables from appropriate 'config/<NODE_ENV>.json' file (where NODE_ENV is 'production' or 'development')
+console.log(`Application name: ${config.get('name')}`);
+console.log(`Mail Host: ${config.get('mail.host')}`);
+
+// this will not get any 'mail.password' variable from 'config/<NODE_ENV>.json' file,
+// therefore it will find that in 'config/custom-environment-variables.json' file,
+// in which where the mapping of config->env relations of variables.
+// For example below the following steps of this example
+console.log(`Mail Password: ${config.get('mail.password')}`);
+// config.get('mail.password')
+// mail.password => APP_MAIL_PASSWORD => secret
+// before running this we should set that env variable like "export APP_MAIL_PASSWORD=secret"
+
 
 // app.use(express.static('uploads')) // This is a simple way. Actually static content are served from the root of the site
 app.use('/images', express.static('uploads')); // with this we will have statically/publicly available 'uploads' folder (example: http://localhost:3000/images/1558704580_Chrysanthemum.jpg)
