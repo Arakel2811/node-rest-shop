@@ -6,6 +6,22 @@ const Product = require('../models/product');
 const model_name = Product.model_name;
 const model_docs = Product.model_docs;
 
+//ss We can define debuggers with custom names, which will do "console.log" job (same functionality) for specific cases.
+// For example when we wanna console-log
+// 1. only errors, then we can define env variable as DEBUG=err
+// 2. doc & docs results, then we can define DEBUG=doc,docs
+// 3. all, then we can define DEBUG=*
+// And after that run node (for us: npm start).
+// Also we can run node with debug variable(s) at same time like this (example for us),
+// DEBUG=doc,err npm start
+// which will flush env DEBUG initialized value(s) after stopping the node
+const errorDebugger = require('debug')('err');
+const docDebugger = require('debug')('doc');
+const docsDebugger = require('debug')('docs');
+const fileDebugger = require('debug')('file');
+// Note: that we can define env variables like this:
+// export DEBUG=err // UNIX (Mac & Linux)
+// set DEBUG=err // Windows
 
 
 exports.get_products = (req, res, next) => {
@@ -13,7 +29,7 @@ exports.get_products = (req, res, next) => {
         .select('name price image _id')
         // .exec()
         .then(docs => {
-            console.log(docs);
+            docsDebugger(docs); // console.log(docs);
 
             const response = {
                 count: docs.length,
@@ -47,7 +63,7 @@ exports.get_products = (req, res, next) => {
             // }
         })
         .catch(err => {
-            console.log(err);
+            errorDebugger(err); // console.log(err);
             res.status(500).json({
                 success: false,
                 message: err
@@ -61,7 +77,7 @@ exports.get_product = (req, res, next) => {
         .select('name price image _id')
         // .exec()
         .then(doc => {
-            console.log(doc);
+            docDebugger(doc); // console.log(doc);
 
             if(doc) {
                 // res.status(200).json(doc);
@@ -88,7 +104,7 @@ exports.get_product = (req, res, next) => {
             }
         })
         .catch(err => {
-            console.log(err);
+            errorDebugger(err); // console.log(err);
             res.status(500).json({
                 success: false,
                 message: err
@@ -98,7 +114,7 @@ exports.get_product = (req, res, next) => {
 
 exports.create_product = (req, res, next) => {
 
-    console.log(req.file);
+    fileDebugger(req.file); // console.log(req.file);
 
     const createdItem = new Product({
         _id: new mongoose.Types.ObjectId(),
@@ -109,7 +125,7 @@ exports.create_product = (req, res, next) => {
 
     createdItem.save()
         .then(result => {
-            console.log(result);
+            docDebugger(result); // console.log(result);
 
             res.status(201).json({
                 success: true,
@@ -129,7 +145,7 @@ exports.create_product = (req, res, next) => {
             });
         })
         .catch(err => {
-            console.log(err);
+            errorDebugger(err); // console.log(err);
             res.status(500).json({
                 success: false,
                 message: err
@@ -161,7 +177,7 @@ exports.delete_product = (req, res, next) => {
             });
         })
         .catch(err => {
-            console.log(err);
+            errorDebugger(err); // console.log(err);
             res.status(500).json({
                 success: false,
                 message: err
@@ -197,7 +213,7 @@ exports.update_product = (req, res, next) => {
             });
         })
         .catch(err => {
-            console.log(err);
+            errorDebugger(err); // console.log(err);
             res.status(500).json({
                 success: false,
                 message: err
